@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: document(title='okerry platform 로그인', content=~{::main})}">
+<main class="auth-page">
+    <section class="auth-card" aria-labelledby="login-title">
+        <header class="auth-card__header">
+            <div class="brand-mark" aria-hidden="true">O</div>
+            <h1 class="auth-title" id="login-title">okerry platform</h1>
+            <p class="auth-subtitle">계정으로 로그인하세요.</p>
+        </header>
+
+        <form class="auth-card__body" th:action="@{/login}" method="post">
+            <div class="alert alert--danger" role="alert" th:if="${param.error}">
+                이메일 또는 비밀번호를 확인하세요.
+            </div>
+
+            <div class="form-field">
+                <label class="form-label" for="username">이메일</label>
+                <input class="form-input"
+                       id="username"
+                       name="username"
+                       type="email"
+                       autocomplete="username"
+                       placeholder="name@example.com"
+                       required>
+            </div>
+
+            <div class="form-field">
+                <label class="form-label" for="password">비밀번호</label>
+                <input class="form-input"
+                       id="password"
+                       name="password"
+                       type="password"
+                       autocomplete="current-password"
+                       required>
+            </div>
+
+            <div class="form-row">
+                <label class="checkbox-field">
+                    <input type="checkbox" name="remember-me">
+                    <span>로그인 유지</span>
+                </label>
+            </div>
+
+            <button class="button button--primary button--full" type="submit">로그인</button>
+        </form>
+
+        <footer class="auth-card__footer">
+            <a th:href="@{/signup}">회원가입</a>
+        </footer>
+    </section>
+</main>
+</html>
