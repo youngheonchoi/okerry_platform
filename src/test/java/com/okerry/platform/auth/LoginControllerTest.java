@@ -1,6 +1,7 @@
 package com.okerry.platform.auth;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.stringContainsInOrder;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -26,9 +27,13 @@ class LoginControllerTest {
         mockMvc.perform(get("/login"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("okerry platform")))
-                .andExpect(content().string(containsString("/css/platform_style.css")))
+                .andExpect(content().string(stringContainsInOrder(
+                        "okerry-ui.css",
+                        "/css/platform_style.css")))
+                .andExpect(content().string(containsString("class=\"okerry-input\"")))
                 .andExpect(content().string(containsString("name=\"username\"")))
-                .andExpect(content().string(containsString("name=\"password\"")));
+                .andExpect(content().string(containsString("name=\"password\"")))
+                .andExpect(content().string(containsString("href=\"/signup\"")));
     }
 
     @Test

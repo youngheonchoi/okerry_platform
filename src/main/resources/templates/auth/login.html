@@ -1,53 +1,57 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       th:replace="~{fragments/layout :: document(title='okerry platform 로그인', content=~{::main})}">
-<main class="auth-page">
-    <section class="auth-card" aria-labelledby="login-title">
-        <header class="auth-card__header">
-            <div class="brand-mark" aria-hidden="true">O</div>
-            <h1 class="auth-title" id="login-title">okerry platform</h1>
-            <p class="auth-subtitle">계정으로 로그인하세요.</p>
-        </header>
+<main class="platform-auth-page okerry-container">
+    <section class="platform-auth-card-wrap" aria-labelledby="login-title">
+        <div class="okerry-card">
+            <header class="okerry-card-header okerry-stack">
+                <h1 class="okerry-title-2xl" id="login-title">okerry platform</h1>
+                <p class="okerry-text-muted">계정으로 로그인하세요.</p>
+            </header>
 
-        <form class="auth-card__body" th:action="@{/login}" method="post">
-            <div class="alert alert--danger" role="alert" th:if="${param.error}">
+            <form class="okerry-card-body okerry-stack" th:action="@{/login}" method="post">
+                <div class="okerry-alert okerry-alert-danger" role="alert" th:if="${param.error}">
                 이메일 또는 비밀번호를 확인하세요.
-            </div>
+                </div>
 
-            <div class="form-field">
-                <label class="form-label" for="username">이메일</label>
-                <input class="form-input"
+                <div class="okerry-field">
+                    <label class="okerry-label" for="username">이메일</label>
+                    <input class="okerry-input"
                        id="username"
                        name="username"
                        type="email"
                        autocomplete="username"
                        placeholder="name@example.com"
                        required>
-            </div>
+                </div>
 
-            <div class="form-field">
-                <label class="form-label" for="password">비밀번호</label>
-                <input class="form-input"
+                <div class="okerry-field">
+                    <label class="okerry-label" for="password">비밀번호</label>
+                    <input class="okerry-input"
                        id="password"
                        name="password"
                        type="password"
                        autocomplete="current-password"
                        required>
-            </div>
+                </div>
 
-            <div class="form-row">
-                <label class="checkbox-field">
-                    <input type="checkbox" name="remember-me">
-                    <span>로그인 유지</span>
-                </label>
-            </div>
+                <div class="okerry-row">
+                    <label class="okerry-label">
+                        <input type="checkbox" name="remember-me">
+                        <span>로그인 유지</span>
+                    </label>
+                </div>
 
-            <button class="button button--primary button--full" type="submit">로그인</button>
-        </form>
+                <div class="platform-auth-action">
+                    <button class="okerry-btn okerry-btn-primary" type="submit">로그인</button>
+                </div>
+            </form>
 
-        <footer class="auth-card__footer">
-            <a th:href="@{/signup}">회원가입</a>
-        </footer>
+            <footer class="okerry-card-footer okerry-center">
+                <span class="okerry-text-muted">계정이 없으신가요?</span>
+                <a th:href="@{/signup}">회원가입</a>
+            </footer>
+        </div>
     </section>
 </main>
 </html>
