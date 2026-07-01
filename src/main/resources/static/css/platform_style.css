@@ -2,6 +2,20 @@
     min-height: 100vh;
 }
 
+body.okerry_ui {
+    min-height: 100vh;
+    margin: 0;
+    background: var(--okerry-color-bg);
+    color: var(--okerry-color-text);
+}
+
+.platform-theme-toggle {
+    position: fixed;
+    right: var(--okerry-space-lg);
+    bottom: var(--okerry-space-lg);
+    z-index: 10;
+}
+
 .platform-auth-page {
     display: grid;
     min-height: 100vh;
@@ -17,9 +31,29 @@
     width: 100%;
 }
 
+.platform-inline-action {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--okerry-space-sm);
+    align-items: end;
+}
+
+.platform-auth-help {
+    text-align: center;
+}
+
 @media (max-width: 480px) {
     .platform-auth-page {
         align-items: start;
         padding-block: var(--okerry-space-md);
+    }
+
+    .platform-theme-toggle {
+        right: var(--okerry-space-md);
+        bottom: var(--okerry-space-md);
+    }
+
+    .platform-inline-action {
+        grid-template-columns: 1fr;
     }
 }

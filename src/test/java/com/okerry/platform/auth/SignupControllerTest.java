@@ -23,7 +23,15 @@ class SignupControllerTest {
         mockMvc.perform(get("/signup"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("회원가입")))
+                .andExpect(content().string(containsString("data-okerry-theme=\"light\"")))
+                .andExpect(content().string(containsString("<body class=\"okerry_ui\" data-okerry-theme=\"light\">")))
+                .andExpect(content().string(containsString("id=\"theme-toggle\"")))
+                .andExpect(content().string(containsString("src=\"/js/platform_theme.js\"")))
                 .andExpect(content().string(containsString("name=\"email\"")))
+                .andExpect(content().string(containsString("id=\"email-verification-trigger\"")))
+                .andExpect(content().string(containsString("data-email-verification-panel")))
+                .andExpect(content().string(containsString("name=\"verificationCode\"")))
+                .andExpect(content().string(containsString("id=\"email-verification-confirm\"")))
                 .andExpect(content().string(containsString("name=\"password\"")))
                 .andExpect(content().string(containsString("href=\"/login\"")));
     }
