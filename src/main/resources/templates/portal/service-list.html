@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: document(title='okerry platform 서비스 목록', content=~{::main})}">
+<main class="platform-portal-page okerry-container">
+    <section class="platform-portal-shell okerry-section" aria-labelledby="portal-services-title">
+        <header class="platform-portal-header okerry-card">
+            <div class="okerry-card-body platform-portal-header-body">
+                <div class="okerry-stack">
+                    <h1 class="okerry-title-2xl"
+                        id="portal-services-title"
+                        th:text="${displayName + '님 환영합니다.'}">
+                        사용자님 환영합니다.
+                    </h1>
+                    <p class="okerry-text-muted">접근 가능한 서비스를 선택해 바로 이동할 수 있습니다.</p>
+                </div>
+
+                <form th:action="@{/logout}" method="post">
+                    <input type="hidden"
+                           th:name="${_csrf.parameterName}"
+                           th:value="${_csrf.token}">
+                    <button class="okerry-btn okerry-btn-secondary" type="submit">로그아웃</button>
+                </form>
+            </div>
+        </header>
+
+        <section class="platform-service-list-panel okerry-card" aria-labelledby="available-services-title">
+            <div class="okerry-card-header okerry-stack">
+                <h2 class="okerry-title-xl" id="available-services-title">접근 가능 서비스</h2>
+            </div>
+
+            <div class="okerry-card-body platform-service-list-panel-body">
+                <div class="platform-service-list">
+                    <article class="okerry-card platform-service-card"
+                             th:each="service : ${availableServices}">
+                        <div class="okerry-card-body okerry-stack">
+                            <div class="okerry-stack">
+                                <h3 class="okerry-title-lg" th:text="${service.name}">서비스 이름</h3>
+                                <p class="okerry-text-muted" th:text="${service.description}">서비스 설명</p>
+                            </div>
+
+                            <div class="platform-service-card-action">
+                                <a class="okerry-btn okerry-btn-primary"
+                                   th:href="${service.entryPoint}">
+                                    서비스 이동
+                                </a>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+    </section>
+</main>
+</html>
