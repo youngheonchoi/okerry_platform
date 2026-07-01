@@ -47,14 +47,14 @@ DB 스키마와 도메인 모델, JPA Entity, Repository, Migration Script가 �
 
 ### /doc/design/DESIGN.md
 
-프로젝트 UI의 색상, 타이포그래피, 간격, radius, 컴포넌트 스타일, 라이트/다크 모드 기준을 설명합니다.
+Okerry UI CDN의 적용 방식과 공통 UI 클래스 및 CSS 변수의 사용 우선순위, 프로젝트 전용 스타일 작성 기준을 설명합니다.
 로그인, 회원가입, 서비스 선택 화면 등 사용자에게 노출되는 UI를 구현하거나 수정할 때는 반드시 `/doc/design/DESIGN.md`를 먼저 확인합니다.
 
 ### /src/main/resources/static/css/platform_style.css
 
-디자인 시스템에서 사용하는 CSS 변수의 실제 정의 파일입니다.
-색상, 간격, radius, shadow, font 등 스타일 값을 사용할 때는 하드코딩하지 않고 `platform_style.css`에 정의된 CSS 변수를 우선 사용합니다.
-새로운 스타일 값이 필요하면 코드에 직접 값을 넣기 전에 `DESIGN.md`와 `platform_style.css`에 추가해야 하는 공통 토큰인지 먼저 판단합니다.
+Okerry UI CDN에서 제공하지 않는 프로젝트 전용 스타일을 정의하는 파일입니다.
+공통 UI는 Okerry UI 클래스와 CSS 변수를 우선 사용하며, `platform_style.css`에서 버튼, 입력창, 카드 등 공통 컴포넌트를 다시 정의하지 않습니다.
+프로젝트 전용 스타일을 추가할 때도 색상, 간격, radius, shadow 등은 Okerry UI CSS 변수를 사용하고, Okerry UI CDN 다음에 `platform_style.css`를 불러오는 순서를 유지합니다.
 
 
 
