@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: document(title='okerry platform 회원가입', content=~{::main})}">
+<main class="platform-auth-page okerry-container">
+    <section class="platform-auth-card-wrap" aria-labelledby="signup-title">
+        <div class="okerry-card">
+            <header class="okerry-card-header okerry-stack">
+                <h1 class="okerry-title-2xl" id="signup-title">회원가입</h1>
+                <p class="okerry-text-muted">여러 서비스에서 사용할 SSO 계정을 만드세요.</p>
+            </header>
+
+            <form class="okerry-card-body okerry-stack" th:action="@{/signup}" method="post">
+                <div class="okerry-field">
+                    <label class="okerry-label" for="name">이름</label>
+                    <input class="okerry-input"
+                           id="name"
+                           name="name"
+                           type="text"
+                           autocomplete="name"
+                           required>
+                </div>
+
+                <div class="okerry-field">
+                    <label class="okerry-label" for="email">이메일</label>
+                    <input class="okerry-input"
+                           id="email"
+                           name="email"
+                           type="email"
+                           autocomplete="username"
+                           placeholder="name@example.com"
+                           required>
+                </div>
+
+                <div class="okerry-field">
+                    <label class="okerry-label" for="password">비밀번호</label>
+                    <input class="okerry-input"
+                           id="password"
+                           name="password"
+                           type="password"
+                           autocomplete="new-password"
+                           required>
+                </div>
+
+                <div class="okerry-field">
+                    <label class="okerry-label" for="password-confirmation">비밀번호 확인</label>
+                    <input class="okerry-input"
+                           id="password-confirmation"
+                           name="passwordConfirmation"
+                           type="password"
+                           autocomplete="new-password"
+                           required>
+                </div>
+
+                <div class="platform-auth-action">
+                    <button class="okerry-btn okerry-btn-primary" type="submit">회원가입</button>
+                </div>
+            </form>
+
+            <footer class="okerry-card-footer okerry-center">
+                <span class="okerry-text-muted">이미 계정이 있으신가요?</span>
+                <a th:href="@{/login}">로그인</a>
+            </footer>
+        </div>
+    </section>
+</main>
+</html>
