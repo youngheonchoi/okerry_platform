@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org" th:fragment="document(title, content)">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" data-okerry-theme="light" th:fragment="document(title, content)">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,9 +8,17 @@
           href="https://cdn.jsdelivr.net/gh/youngheonchoi/okerry_ui@main/concept/default/v1.0.0/okerry-ui.css">
     <link rel="stylesheet" th:href="@{/css/platform_style.css}">
 </head>
-<body>
+<body class="okerry_ui" data-okerry-theme="light">
 <div class="platform-page" th:replace="${content}">
     <main></main>
 </div>
+<button class="okerry-btn okerry-btn-secondary platform-theme-toggle"
+        id="theme-toggle"
+        type="button"
+        aria-label="다크 모드로 전환"
+        aria-pressed="false">
+    다크 모드
+</button>
+<script defer src="/js/platform_theme.js" th:src="@{/js/platform_theme.js}"></script>
 </body>
 </html>

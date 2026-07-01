@@ -6,7 +6,7 @@
         <div class="okerry-card">
             <header class="okerry-card-header okerry-stack">
                 <h1 class="okerry-title-2xl" id="signup-title">회원가입</h1>
-                <p class="okerry-text-muted">여러 서비스에서 사용할 SSO 계정을 만드세요.</p>
+                <p class="okerry-text-muted">여러 서비스에서 사용할 계정을 만드세요.</p>
             </header>
 
             <form class="okerry-card-body okerry-stack" th:action="@{/signup}" method="post">
@@ -22,13 +22,44 @@
 
                 <div class="okerry-field">
                     <label class="okerry-label" for="email">이메일</label>
-                    <input class="okerry-input"
-                           id="email"
-                           name="email"
-                           type="email"
-                           autocomplete="username"
-                           placeholder="name@example.com"
-                           required>
+                    <div class="platform-inline-action">
+                        <input class="okerry-input"
+                               id="email"
+                               name="email"
+                               type="email"
+                               autocomplete="username"
+                               placeholder="name@example.com"
+                               required>
+                        <button class="okerry-btn okerry-btn-secondary"
+                                id="email-verification-trigger"
+                                type="button"
+                                aria-controls="email-verification-panel"
+                                aria-expanded="false">
+                            인증
+                        </button>
+                    </div>
+                </div>
+
+                <div class="okerry-field"
+                     id="email-verification-panel"
+                     data-email-verification-panel
+                     hidden>
+                    <label class="okerry-label" for="verification-code">인증번호</label>
+                    <div class="platform-inline-action">
+                        <input class="okerry-input"
+                               id="verification-code"
+                               name="verificationCode"
+                               type="text"
+                               inputmode="numeric"
+                               autocomplete="one-time-code"
+                               placeholder="인증번호를 입력하세요">
+                        <button class="okerry-btn okerry-btn-primary"
+                                id="email-verification-confirm"
+                                type="button">
+                            확인
+                        </button>
+                    </div>
+                    <p class="okerry-help-text">인증 버튼을 누른 뒤 받은 인증번호를 입력하세요.</p>
                 </div>
 
                 <div class="okerry-field">

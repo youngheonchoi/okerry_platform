@@ -30,10 +30,25 @@ class LoginControllerTest {
                 .andExpect(content().string(stringContainsInOrder(
                         "okerry-ui.css",
                         "/css/platform_style.css")))
+                .andExpect(content().string(containsString("data-okerry-theme=\"light\"")))
+                .andExpect(content().string(containsString("<body class=\"okerry_ui\" data-okerry-theme=\"light\">")))
+                .andExpect(content().string(containsString("id=\"theme-toggle\"")))
+                .andExpect(content().string(containsString("src=\"/js/platform_theme.js\"")))
                 .andExpect(content().string(containsString("class=\"okerry-input\"")))
                 .andExpect(content().string(containsString("name=\"username\"")))
                 .andExpect(content().string(containsString("name=\"password\"")))
+                .andExpect(content().string(containsString("관리자에게 문의해주세요.")))
                 .andExpect(content().string(containsString("href=\"/signup\"")));
+    }
+
+    @Test
+    void platformThemeScriptIsServed() throws Exception {
+        mockMvc.perform(get("/js/platform_theme.js"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("DOMContentLoaded")))
+                .andExpect(content().string(containsString("applyTheme(\"light\")")))
+                .andExpect(content().string(containsString("data-okerry-theme")))
+                .andExpect(content().string(containsString("theme-toggle")));
     }
 
     @Test
