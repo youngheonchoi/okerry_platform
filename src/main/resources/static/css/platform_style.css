@@ -42,6 +42,65 @@ body.okerry_ui {
     text-align: center;
 }
 
+.platform-portal-page {
+    box-sizing: border-box;
+    height: 100vh;
+    height: 100dvh;
+    padding-block: var(--okerry-space-xl);
+    overflow: hidden;
+}
+
+.platform-portal-shell {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: var(--okerry-space-lg);
+    height: 100%;
+    min-height: 0;
+}
+
+.platform-portal-header-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    gap: var(--okerry-space-lg);
+}
+
+.platform-service-list {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: var(--okerry-space-md);
+    min-height: 0;
+    min-width: 0;
+    overflow-y: auto;
+    padding-right: var(--okerry-space-xs);
+}
+
+.platform-service-list-panel {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    flex: 1;
+    overflow: hidden;
+}
+
+.platform-service-list-panel-body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.platform-service-card {
+    background: var(--okerry-color-surface);
+    flex-shrink: 0;
+}
+
+.platform-service-card-action {
+    display: flex;
+    justify-content: end;
+}
+
 @media (max-width: 480px) {
     .platform-auth-page {
         align-items: start;
@@ -55,5 +114,21 @@ body.okerry_ui {
 
     .platform-inline-action {
         grid-template-columns: 1fr;
+    }
+
+    .platform-portal-page {
+        padding-block: var(--okerry-space-md);
+    }
+
+    .platform-portal-header-body {
+        flex-direction: column;
+    }
+
+    .platform-service-card-action {
+        justify-content: stretch;
+    }
+
+    .platform-service-card-action > .okerry-btn {
+        width: 100%;
     }
 }
