@@ -49,3 +49,4 @@
 | 003 | 완료 | 로그인, 회원가입 화면 개선     | [TASK_003_DETAIL.md](./TASK_003_DETAIL.md) |
 | 004 | 완료 | 접속 가능 컨텐츠 리스트 화면 구현 | [TASK_004_DETAIL.md](./TASK_004_DETAIL.md) |
 | 005 | 완료 | SSO 사용자 저장 기반 구현      | [TASK_005_DETAIL.md](./TASK_005_DETAIL.md) |
+| 006 | 완료 | SSO 회원가입 및 DB 기반 로그인 구현 | [TASK_006_DETAIL.md](./TASK_006_DETAIL.md) |

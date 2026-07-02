@@ -65,4 +65,10 @@ public class AuthUserCredential {
     public AuthUser getUser() { return user; }
     public String getPasswordHash() { return passwordHash; }
     public String getPasswordAlgorithm() { return passwordAlgorithm; }
+    public LocalDateTime getLockedUntil() { return lockedUntil; }
+
+    public void lockUntil(LocalDateTime unlockAt) {
+        this.lockedUntil = Objects.requireNonNull(unlockAt);
+        this.updatedAt = LocalDateTime.now();
+    }
 }

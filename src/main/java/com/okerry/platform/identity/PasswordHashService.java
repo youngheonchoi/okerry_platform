@@ -1,6 +1,5 @@
 package com.okerry.platform.identity;
 
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +11,11 @@ public class PasswordHashService {
 
     public static final String ALGORITHM = "BCRYPT";
 
-    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(12);
+    private final PasswordEncoder passwordEncoder;
+
+    public PasswordHashService(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+    }
 
     public String hash(String rawPassword) {
         return passwordEncoder.encode(rawPassword);

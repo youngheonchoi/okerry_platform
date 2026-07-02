@@ -6,18 +6,31 @@
         <div class="okerry-card">
             <header class="okerry-card-header okerry-stack">
                 <h1 class="okerry-title-2xl" id="signup-title">회원가입</h1>
-                <p class="okerry-text-muted">여러 서비스에서 사용할 계정을 만드세요.</p>
             </header>
 
-            <form class="okerry-card-body okerry-stack" th:action="@{/signup}" method="post">
+            <form class="okerry-card-body okerry-stack"
+                  th:action="@{/signup}"
+                  th:object="${signupRequest}"
+                  method="post">
+                <div class="okerry-alert okerry-alert-danger"
+                     role="alert"
+                     th:if="${#fields.hasGlobalErrors()}"
+                     th:each="error : ${#fields.globalErrors()}"
+                     th:text="${error}">
+                    회원가입을 처리할 수 없습니다.
+                </div>
+
                 <div class="okerry-field">
                     <label class="okerry-label" for="name">이름</label>
                     <input class="okerry-input"
                            id="name"
-                           name="name"
+                           th:field="*{name}"
                            type="text"
                            autocomplete="name"
                            required>
+                    <p class="okerry-error-text"
+                       th:if="${#fields.hasErrors('name')}"
+                       th:errors="*{name}">이름 입력 오류</p>
                 </div>
 
                 <div class="okerry-field">
@@ -25,7 +38,7 @@
                     <div class="platform-inline-action">
                         <input class="okerry-input"
                                id="email"
-                               name="email"
+                               th:field="*{email}"
                                type="email"
                                autocomplete="username"
                                placeholder="name@example.com"
@@ -38,6 +51,9 @@
                             인증
                         </button>
                     </div>
+                    <p class="okerry-error-text"
+                       th:if="${#fields.hasErrors('email')}"
+                       th:errors="*{email}">이메일 입력 오류</p>
                 </div>
 
                 <div class="okerry-field"
@@ -66,20 +82,29 @@
                     <label class="okerry-label" for="password">비밀번호</label>
                     <input class="okerry-input"
                            id="password"
-                           name="password"
+                           th:field="*{password}"
                            type="password"
                            autocomplete="new-password"
                            required>
+                    <p class="okerry-error-text"
+                       th:if="${#fields.hasErrors('password')}"
+                       th:errors="*{password}">비밀번호 입력 오류</p>
                 </div>
 
                 <div class="okerry-field">
                     <label class="okerry-label" for="password-confirmation">비밀번호 확인</label>
                     <input class="okerry-input"
                            id="password-confirmation"
-                           name="passwordConfirmation"
+                           th:field="*{passwordConfirmation}"
                            type="password"
                            autocomplete="new-password"
                            required>
+                    <p class="okerry-error-text"
+                       th:if="${#fields.hasErrors('passwordConfirmation')}"
+                       th:errors="*{passwordConfirmation}">비밀번호 확인 입력 오류</p>
+                    <p class="okerry-error-text"
+                       th:if="${#fields.hasErrors('passwordConfirmed')}"
+                       th:errors="*{passwordConfirmed}">비밀번호 확인 오류</p>
                 </div>
 
                 <div class="platform-auth-action">
