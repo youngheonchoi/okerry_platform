@@ -3,6 +3,7 @@ HELP.md
 ### Gradle ###
 .gradle/
 build/
+/gradle.properties
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
@@ -59,6 +60,7 @@ temp/
 .env
 .env.*
 !.env.example
+.envrc
 *.local
 application-local.properties
 application-local.yml
@@ -66,8 +68,18 @@ application-local.yaml
 application-secret.properties
 application-secret.yml
 application-secret.yaml
+**/application-local.properties
+**/application-local.yml
+**/application-local.yaml
+**/application-secret.properties
+**/application-secret.yml
+**/application-secret.yaml
 
 ### Secrets / keys / certificates ###
+.secrets/
+secrets/
+credentials.json
+service-account*.json
 *.pem
 *.key
 *.p12
@@ -76,6 +88,16 @@ application-secret.yaml
 *.keystore
 *.crt
 *.cer
+*.der
+*.csr
+*.kdbx
+
+### Local database backups / dumps ###
+db-dumps/
+dumps/
+*.dump
+*.sql.gz
+*.sql.zip
 
 ### Agent / local workspace metadata ###
 .agents/
