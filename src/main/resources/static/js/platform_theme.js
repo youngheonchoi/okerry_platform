@@ -2,8 +2,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const root = document.documentElement;
     const body = document.body;
     const themeToggle = document.getElementById("theme-toggle");
-    const verificationTrigger = document.getElementById("email-verification-trigger");
-    const verificationPanel = document.querySelector("[data-email-verification-panel]");
 
     const applyTheme = (theme) => {
         const nextTheme = theme === "dark" ? "dark" : "light";
@@ -32,10 +30,4 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    if (verificationTrigger && verificationPanel) {
-        verificationTrigger.addEventListener("click", () => {
-            verificationPanel.hidden = !verificationPanel.hidden;
-            verificationTrigger.setAttribute("aria-expanded", String(!verificationPanel.hidden));
-        });
-    }
 });

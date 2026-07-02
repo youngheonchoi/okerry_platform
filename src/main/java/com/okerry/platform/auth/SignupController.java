@@ -1,6 +1,7 @@
 package com.okerry.platform.auth;
 
 import jakarta.validation.Valid;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -29,7 +30,8 @@ public class SignupController {
     @PostMapping("/signup")
     public String signup(
             @Valid @ModelAttribute("signupRequest") SignupRequest request,
-            BindingResult bindingResult) {
+            BindingResult bindingResult,
+            HttpSession session) {
         if (bindingResult.hasErrors()) {
             return "auth/signup";
         }
@@ -37,6 +39,11 @@ public class SignupController {
         SignupService signupService = signupServiceProvider.getIfAvailable();
         if (signupService == null) {
             bindingResult.reject("signup.unavailable", "현재 회원가입을 처리할 수 없습니다.");
+            return "auth/signup";
+        }
+        Object verifiedEmail = session.getAttribute(EmailVerificationController.VERIFIED_EMAIL_SESSION_KEY);
+        if (!SignupService.normalizeEmail(request.getEmail()).equals(verifiedEmail)) {
+            bindingResult.rejectValue("email", "signup.email.unverified", "이메일 인증을 완료해주세요.");
             return "auth/signup";
         }
 
@@ -56,6 +63,7 @@ public class SignupController {
             return "auth/signup";
         }
 
+        session.removeAttribute(EmailVerificationController.VERIFIED_EMAIL_SESSION_KEY);
         return "redirect:/login?registered";
     }
 }

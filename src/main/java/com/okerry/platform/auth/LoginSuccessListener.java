@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
  * 로그인 성공 이벤트를 받아 사용자의 마지막 로그인 시각을 갱신한다.
  */
 @Component
-@Profile("db")
+@Profile("neon")
 public class LoginSuccessListener {
 
     private final AuthUserRepository userRepository;

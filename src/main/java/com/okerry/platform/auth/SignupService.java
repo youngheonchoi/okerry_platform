@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
  * 회원가입 사용자, 비밀번호 인증 정보, 기본 권한 연결을 하나의 트랜잭션으로 저장한다.
  */
 @Service
-@Profile("db")
+@Profile("neon")
 public class SignupService {
 
     static final String DEFAULT_ROLE_CODE = "AUTH_USER";
@@ -58,6 +58,7 @@ public class SignupService {
         AuthRole defaultRole = roleRepository.findByCode(DEFAULT_ROLE_CODE)
                 .orElseThrow(() -> new RequiredRoleNotFoundException(DEFAULT_ROLE_CODE));
         AuthUser user = new AuthUser(email, request.getName().trim(), UserStatus.ACTIVE);
+        user.verifyEmail();
 
         try {
             userRepository.saveAndFlush(user);

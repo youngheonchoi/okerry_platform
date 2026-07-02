@@ -32,6 +32,7 @@ class SignupControllerTest {
                 .andExpect(content().string(containsString("data-email-verification-panel")))
                 .andExpect(content().string(containsString("name=\"verificationCode\"")))
                 .andExpect(content().string(containsString("id=\"email-verification-confirm\"")))
+                .andExpect(content().string(containsString("/js/platform_signup.js")))
                 .andExpect(content().string(containsString("name=\"password\"")))
                 .andExpect(content().string(containsString("href=\"/login\"")));
     }

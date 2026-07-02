@@ -19,10 +19,24 @@
 | Security | Spring Security, OAuth2 Client |
 | View | Thymeleaf, Thymeleaf Spring Security |
 | Persistence | Spring Data JPA, Spring JDBC |
-| Database | MySQL |
+| Database | PostgreSQL (Neon) |
 | Validation | Spring Validation |
 | Utility | Lombok |
 | Test | JUnit 5, Spring Boot Test |
+
+
+## Neon 로컬 실행
+
+Neon 연결 설정은 Git에서 제외된 `src/main/resources/application-neon.properties`에 두고, 비밀번호는 파일에 작성하지 않습니다.
+실행 환경에 `NEON_DATABASE_PASSWORD`를 설정한 뒤 `neon` 프로필로 실행합니다.
+
+```text
+SPRING_PROFILES_ACTIVE=neon
+NEON_DATABASE_PASSWORD=로컬 환경변수로 설정
+SMTP_GMAIL_APP_PASSWORD=Gmail App Password를 로컬 환경변수로 설정
+```
+
+애플리케이션은 pooled endpoint와 SSL 연결을 사용하고, `spring.jpa.hibernate.ddl-auto=validate`로 기존 스키마를 검증만 합니다.
 
 
 ## 서비스 흐름

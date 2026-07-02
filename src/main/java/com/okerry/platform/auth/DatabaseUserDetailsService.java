@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
  * DB의 사용자, 비밀번호 해시, 권한과 계정 상태를 Spring Security 인증 정보로 변환한다.
  */
 @Service
-@Profile("db")
+@Profile("neon")
 public class DatabaseUserDetailsService implements UserDetailsService {
 
     private final AuthUserRepository userRepository;

@@ -30,10 +30,10 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles("db")
+@ActiveProfiles("neon")
 @TestPropertySource(properties = {
         "spring.autoconfigure.exclude=",
-        "spring.datasource.url=jdbc:h2:mem:signup-login;MODE=MySQL;DB_CLOSE_DELAY=-1",
+        "spring.datasource.url=jdbc:h2:mem:signup-login;MODE=PostgreSQL;DB_CLOSE_DELAY=-1",
         "spring.datasource.username=sa",
         "spring.datasource.password=",
         "spring.jpa.hibernate.ddl-auto=create-drop"
@@ -71,6 +71,7 @@ class SignupLoginIntegrationTest {
     void signupStoresHashedPasswordAndUserCanLogin() throws Exception {
         mockMvc.perform(post("/signup")
                         .with(csrf())
+                        .sessionAttr(EmailVerificationController.VERIFIED_EMAIL_SESSION_KEY, "user@example.com")
                         .param("name", " 오케리 ")
                         .param("email", " User@Example.COM ")
                         .param("password", "safe-password-123")
@@ -82,7 +83,7 @@ class SignupLoginIntegrationTest {
         AuthUserCredential credential = credentialRepository.findByUserId(user.getId()).orElseThrow();
         assertThat(user.getName()).isEqualTo("오케리");
         assertThat(user.getStatus()).isEqualTo(UserStatus.ACTIVE);
-        assertThat(user.isEmailVerified()).isFalse();
+        assertThat(user.isEmailVerified()).isTrue();
         assertThat(credential.getPasswordHash()).isNotEqualTo("safe-password-123");
         assertThat(passwordHashService.matches("safe-password-123", credential.getPasswordHash())).isTrue();
         assertThat(userRoleRepository.findRoleCodesByUserId(user.getId())).containsExactly("AUTH_USER");
@@ -111,6 +112,7 @@ class SignupLoginIntegrationTest {
 
         mockMvc.perform(post("/signup")
                         .with(csrf())
+                        .sessionAttr(EmailVerificationController.VERIFIED_EMAIL_SESSION_KEY, "user@example.com")
                         .param("name", "다른 사용자")
                         .param("email", "USER@example.com")
                         .param("password", "another-password-123")
@@ -120,6 +122,7 @@ class SignupLoginIntegrationTest {
 
         mockMvc.perform(post("/signup")
                         .with(csrf())
+                        .sessionAttr(EmailVerificationController.VERIFIED_EMAIL_SESSION_KEY, "user@example.com")
                         .param("name", "사용자")
                         .param("email", "invalid-email")
                         .param("password", "safe-password-123")
@@ -168,6 +171,8 @@ class SignupLoginIntegrationTest {
 
         mockMvc.perform(post("/signup")
                         .with(csrf())
+                        .sessionAttr(EmailVerificationController.VERIFIED_EMAIL_SESSION_KEY,
+                                "user@example.com")
                         .param("name", "사용자")
                         .param("email", "user@example.com")
                         .param("password", "safe-password-123")
@@ -180,9 +185,25 @@ class SignupLoginIntegrationTest {
         assertThat(userRoleRepository.count()).isZero();
     }
 
+    @Test
+    void signupRequiresVerifiedEmailInSameSession() throws Exception {
+        mockMvc.perform(post("/signup")
+                        .with(csrf())
+                        .param("name", "사용자")
+                        .param("email", "user@example.com")
+                        .param("password", "safe-password-123")
+                        .param("passwordConfirmation", "safe-password-123"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("이메일 인증을 완료해주세요.")));
+
+        assertThat(userRepository.count()).isZero();
+    }
+
     private void performSignup(String email, String password) throws Exception {
         mockMvc.perform(post("/signup")
                         .with(csrf())
+                        .sessionAttr(EmailVerificationController.VERIFIED_EMAIL_SESSION_KEY,
+                                SignupService.normalizeEmail(email))
                         .param("name", "사용자")
                         .param("email", email)
                         .param("password", password)

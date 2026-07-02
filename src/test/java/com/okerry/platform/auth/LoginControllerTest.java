@@ -37,7 +37,7 @@ class LoginControllerTest {
                 .andExpect(content().string(containsString("class=\"okerry-input\"")))
                 .andExpect(content().string(containsString("name=\"username\"")))
                 .andExpect(content().string(containsString("name=\"password\"")))
-                .andExpect(content().string(containsString("관리자에게 문의해주세요.")))
+                .andExpect(content().string(containsString("아이디 비밀번호 찾기는 관리자에게 문의해 주세요.")))
                 .andExpect(content().string(containsString("href=\"/signup\"")));
     }
 

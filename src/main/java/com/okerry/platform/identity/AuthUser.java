@@ -75,4 +75,9 @@ public class AuthUser {
         this.lastLoginAt = Objects.requireNonNull(loginAt);
         this.updatedAt = loginAt;
     }
+
+    public void verifyEmail() {
+        this.emailVerified = true;
+        this.updatedAt = LocalDateTime.now();
+    }
 }
