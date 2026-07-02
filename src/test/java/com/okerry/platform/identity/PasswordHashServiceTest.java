@@ -3,10 +3,12 @@ package com.okerry.platform.identity;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 class PasswordHashServiceTest {
 
-    private final PasswordHashService passwordHashService = new PasswordHashService();
+    private final PasswordHashService passwordHashService =
+            new PasswordHashService(new BCryptPasswordEncoder(12));
 
     @Test
     void hashesPasswordWithoutStoringPlainText() {

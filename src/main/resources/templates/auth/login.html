@@ -6,10 +6,12 @@
         <div class="okerry-card">
             <header class="okerry-card-header okerry-stack">
                 <h1 class="okerry-title-2xl" id="login-title">okerry platform</h1>
-                <p class="okerry-text-muted">계정으로 로그인하세요.</p>
             </header>
 
             <form class="okerry-card-body okerry-stack" th:action="@{/login}" method="post">
+                <div class="okerry-alert okerry-alert-success" role="status" th:if="${param.registered}">
+                    회원가입이 완료되었습니다. 로그인해주세요.
+                </div>
                 <div class="okerry-alert okerry-alert-danger" role="alert" th:if="${param.error}">
                 이메일 또는 비밀번호를 확인하세요.
                 </div>
@@ -35,13 +37,6 @@
                        required>
                 </div>
 
-                <div class="okerry-row">
-                    <label class="okerry-label">
-                        <input type="checkbox" name="remember-me">
-                        <span>로그인 유지</span>
-                    </label>
-                </div>
-
                 <div class="platform-auth-action">
                     <button class="okerry-btn okerry-btn-primary" type="submit">로그인</button>
                 </div>
@@ -54,7 +49,7 @@
 
             <div class="okerry-card-body">
                 <p class="okerry-caption platform-auth-help">
-                    아이디나 비밀번호를 모르면 관리자에게 문의해주세요.
+                    아이디 비밀번호 찾기는 관리자에게 문의해 주세요.
                 </p>
             </div>
         </div>

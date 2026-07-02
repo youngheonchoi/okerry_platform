@@ -69,4 +69,10 @@ public class AuthUser {
     public String getName() { return name; }
     public UserStatus getStatus() { return status; }
     public boolean isEmailVerified() { return emailVerified; }
+    public LocalDateTime getLastLoginAt() { return lastLoginAt; }
+
+    public void recordSuccessfulLogin(LocalDateTime loginAt) {
+        this.lastLoginAt = Objects.requireNonNull(loginAt);
+        this.updatedAt = loginAt;
+    }
 }

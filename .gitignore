@@ -68,12 +68,14 @@ application-local.yaml
 application-secret.properties
 application-secret.yml
 application-secret.yaml
+application-db.properties
 **/application-local.properties
 **/application-local.yml
 **/application-local.yaml
 **/application-secret.properties
 **/application-secret.yml
 **/application-secret.yaml
+**/application-db.properties
 
 ### Secrets / keys / certificates ###
 .secrets/
