@@ -75,7 +75,9 @@
                             확인
                         </button>
                     </div>
-                    <p class="okerry-help-text">인증 버튼을 누른 뒤 받은 인증번호를 입력하세요.</p>
+                    <p class="okerry-help-text"
+                       id="email-verification-status"
+                       aria-live="polite">인증 버튼을 누른 뒤 받은 인증번호를 입력하세요.</p>
                 </div>
 
                 <div class="okerry-field">
@@ -118,5 +120,6 @@
             </footer>
         </div>
     </section>
+    <script defer th:src="@{/js/platform_signup.js}"></script>
 </main>
 </html>

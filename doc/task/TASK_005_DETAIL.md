@@ -8,7 +8,7 @@ SSO 회원가입과 로그인 기능을 구현하기 전에 사용자, 인증 �
 
 ## 구현 범위
 
-* MySQL `chldudgjs` 데이터베이스의 기존 `auth` 관련 테이블과 데이터를 먼저 확인한다.
+* Neon PostgreSQL의 기존 인증 관련 테이블과 데이터를 먼저 확인한다.
 * 기존 테이블을 임의로 삭제하거나 덮어쓰지 않고 `/doc/architecture/DATABASE.md`와의 차이를 정리한다.
 * `auth_users`, `auth_user_credentials`, `auth_roles`, `auth_user_roles` 스키마는 사용자가 직접 관리한다.
 * 애플리케이션은 `/doc/architecture/DATABASE.md`의 스키마를 기준으로 매핑하고 실행 시 스키마 일치 여부만 검증한다.
@@ -20,8 +20,7 @@ SSO 회원가입과 로그인 기능을 구현하기 전에 사용자, 인증 �
 
 ## DB 접속 참고
 
-* MySQL 데이터베이스명: `chldudgjs`
-* 사용자명: `root`
+* DBMS: Neon PostgreSQL
 * 비밀번호는 사용자가 실행 시 직접 입력하거나 환경변수 등 저장소에 남지 않는 방식으로 주입한다.
 * 비밀번호, 접속 비밀정보, 실제 사용자 데이터는 코드, 설정 파일, 문서, 로그에 기록하지 않는다.
 * 기존 `auth` 관련 테이블이 여러 개 있으므로 스키마 확인 전에는 생성, 변경, 삭제 작업을 수행하지 않는다.
@@ -47,9 +46,9 @@ SSO 회원가입과 로그인 기능을 구현하기 전에 사용자, 인증 �
 
 ## 작업 체크리스트
 
-* [ ] `chldudgjs`의 기존 `auth` 관련 테이블 및 제약 조건 확인
+* [ ] Neon의 기존 인증 관련 테이블 및 제약 조건 확인
 * [ ] 기존 DB 구조와 `/doc/architecture/DATABASE.md` 차이 정리
-* [x] 안전한 MySQL 접속 설정 구성
+* [x] 안전한 DB 접속 설정 구성
 * [x] 사용자 관리 스키마와 일치하는 JPA 매핑 구성
 * [x] 사용자, 인증 정보, 권한 Entity 구현
 * [x] Repository 구현
@@ -83,7 +82,7 @@ SSO 회원가입과 로그인 기능을 구현하기 전에 사용자, 인증 �
 * BCrypt 강도 12를 사용하는 비밀번호 해시 서비스를 추가함.
 * H2 기반 Repository, 유일성 제약 조건, 비밀번호 해시 테스트를 추가함.
 * Windows JDK 21 환경에서 `gradlew.bat test --no-daemon` 실행 통과를 확인함.
-* 현재 실행 환경에 MySQL CLI와 DB 비밀번호가 없어 실제 `chldudgjs` 스키마 비교는 수행하지 못함.
+* 당시 실행 환경에 DB 접속정보가 없어 실제 스키마 비교는 수행하지 못함.
 * 기존 DB를 변경하지 않고 확인할 수 있도록 `TASK_005_SCHEMA_INSPECTION.sql`을 추가함.
 
 ### 2026-07-02
