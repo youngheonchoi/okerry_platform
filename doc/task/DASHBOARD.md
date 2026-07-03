@@ -51,3 +51,4 @@
 | 005 | 완료 | SSO 사용자 저장 기반 구현      | [TASK_005_DETAIL.md](./TASK_005_DETAIL.md) |
 | 006 | 완료 | SSO 회원가입 및 DB 기반 로그인 구현 | [TASK_006_DETAIL.md](./TASK_006_DETAIL.md) |
 | 007 | 완료 | Neon용 PostgreSQL DDL 전환      | [TASK_007_DETAIL.md](./TASK_007_DETAIL.md) |
+| 008 | 진행중 | OAuth2/OIDC Authorization Server 구현 | [TASK_008_DETAIL.md](./TASK_008_DETAIL.md) |

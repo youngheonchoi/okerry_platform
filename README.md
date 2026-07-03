@@ -34,9 +34,46 @@ Neon 연결 설정은 Git에서 제외된 `src/main/resources/application-neon.p
 SPRING_PROFILES_ACTIVE=neon
 NEON_DATABASE_PASSWORD=로컬 환경변수로 설정
 SMTP_GMAIL_APP_PASSWORD=Gmail App Password를 로컬 환경변수로 설정
+OAUTH2_ISSUER_URI=외부에서 접근 가능한 Authorization Server 주소
+OAUTH2_RSA_PUBLIC_KEY=X.509 형식 RSA 공개키의 PEM 또는 Base64 값
+OAUTH2_RSA_PRIVATE_KEY=PKCS#8 형식 RSA 개인키의 PEM 또는 Base64 값
+OAUTH2_RSA_KEY_ID=JWK 식별자
 ```
 
 애플리케이션은 pooled endpoint와 SSL 연결을 사용하고, `spring.jpa.hibernate.ddl-auto=validate`로 기존 스키마를 검증만 합니다.
+RSA Private Key와 Client Secret은 설정 파일 또는 저장소에 기록하지 않고 실행 환경의 비밀정보로 주입합니다.
+
+
+## OAuth2/OIDC Authorization Server
+
+`neon` 프로필에서 OAuth2/OIDC Authorization Server가 활성화됩니다.
+클라이언트는 Authorization Code Flow를 사용하며, 공개 클라이언트는 PKCE를 필수로 설정합니다.
+
+| 용도 | Endpoint |
+| --- | --- |
+| Authorization | `/oauth2/authorize` |
+| Token | `/oauth2/token` |
+| JWK Set | `/oauth2/jwks` |
+| OIDC Discovery | `/.well-known/openid-configuration` |
+| UserInfo | `/userinfo` |
+| Token Revocation | `/oauth2/revoke` |
+
+Client는 `oauth2_registered_client`에 등록하며 Redirect URI는 Callback 주소와 정확히 일치해야 합니다.
+Client Secret은 BCrypt 등 `PasswordEncoder` 형식으로 해시한 값만 저장합니다.
+기본 지원 범위는 `authorization_code`, `refresh_token`, `openid`, `profile`, `email`입니다.
+
+OIDC `sub`에는 내부 DB PK나 이메일 대신 `auth_users.public_id`가 사용됩니다.
+`email` 및 `name` 클레임은 각각 `email`, `profile` scope가 허용된 경우에만 포함됩니다.
+
+```text
+클라이언트
+  -> /oauth2/authorize
+  -> okerry platform 로그인
+  -> 등록된 Redirect URI로 Authorization Code 전달
+  -> /oauth2/token에서 Code와 PKCE verifier 교환
+  -> Access Token, ID Token, Refresh Token 발급
+  -> /userinfo에서 허용된 사용자 식별 정보 조회
+```
 
 
 ## 서비스 흐름
