@@ -69,6 +69,8 @@ class AuthorizationServerIntegrationTest {
     private static final String CLIENT_ID = "integration-client";
     private static final String CLIENT_SECRET = "integration-secret";
     private static final String REDIRECT_URI = "https://client.example.test/login/oauth2/code/okerry";
+    private static final String SECOND_CLIENT_ID = "second-integration-client";
+    private static final String SECOND_CLIENT_REDIRECT_URI = "https://second.example.test/api/auth/callback/okerry";
     private static final String VERIFIER = "0123456789012345678901234567890123456789012345678901234567890123";
 
     @Autowired MockMvc mockMvc;
@@ -125,6 +127,29 @@ class AuthorizationServerIntegrationTest {
                         .build())
                 .build();
         registeredClientRepository.save(client);
+
+        RegisteredClient secondClient = RegisteredClient.withId(UUID.randomUUID().toString())
+                .clientId(SECOND_CLIENT_ID)
+                .clientSecret(passwordEncoder.encode("second-integration-secret"))
+                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+                .redirectUri(SECOND_CLIENT_REDIRECT_URI)
+                .scope(OidcScopes.OPENID)
+                .scope(OidcScopes.PROFILE)
+                .scope(OidcScopes.EMAIL)
+                .clientSettings(ClientSettings.builder()
+                        .requireProofKey(true)
+                        .requireAuthorizationConsent(false)
+                        .build())
+                .tokenSettings(TokenSettings.builder()
+                        .authorizationCodeTimeToLive(Duration.ofMinutes(2))
+                        .accessTokenTimeToLive(Duration.ofMinutes(5))
+                        .refreshTokenTimeToLive(Duration.ofDays(30))
+                        .reuseRefreshTokens(false)
+                        .build())
+                .build();
+        registeredClientRepository.save(secondClient);
     }
 
     @Test
@@ -233,6 +258,31 @@ class AuthorizationServerIntegrationTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(header().string("Location", containsString("error=invalid_request")))
                 .andExpect(header().string("Location", containsString("code_challenge")));
+    }
+
+    @Test
+    void resolvesEachRegisteredClientAndRejectsAnotherClientsRedirectUri() throws Exception {
+        mockMvc.perform(get("/oauth2/authorize")
+                        .accept(MediaType.TEXT_HTML)
+                        .queryParam("response_type", "code")
+                        .queryParam("client_id", SECOND_CLIENT_ID)
+                        .queryParam("redirect_uri", SECOND_CLIENT_REDIRECT_URI)
+                        .queryParam("scope", "openid profile email")
+                        .queryParam("state", "second-client-state")
+                        .queryParam("code_challenge", challenge(VERIFIER))
+                        .queryParam("code_challenge_method", "S256"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(header().string("Location", "/login"));
+
+        mockMvc.perform(get("/oauth2/authorize")
+                        .queryParam("response_type", "code")
+                        .queryParam("client_id", SECOND_CLIENT_ID)
+                        .queryParam("redirect_uri", REDIRECT_URI)
+                        .queryParam("scope", "openid")
+                        .queryParam("state", "cross-client-state")
+                        .queryParam("code_challenge", challenge(VERIFIER))
+                        .queryParam("code_challenge_method", "S256"))
+                .andExpect(status().isBadRequest());
     }
 
     private static String challenge(String verifier) throws Exception {
