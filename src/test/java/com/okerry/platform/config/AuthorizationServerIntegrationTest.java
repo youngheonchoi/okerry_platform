@@ -6,6 +6,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -258,6 +259,34 @@ class AuthorizationServerIntegrationTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(header().string("Location", containsString("error=invalid_request")))
                 .andExpect(header().string("Location", containsString("code_challenge")));
+    }
+
+    @Test
+    void tokenEndpointReturnsOAuthErrorInsteadOfRedirectingToLogin() throws Exception {
+        mockMvc.perform(post("/oauth2/token")
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .param("grant_type", "authorization_code")
+                        .param("code", "invalid-code")
+                        .param("redirect_uri", REDIRECT_URI)
+                        .param("code_verifier", VERIFIER))
+                .andExpect(status().isUnauthorized())
+                .andExpect(header().doesNotExist("Location"))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.error").value("invalid_client"));
+
+        mockMvc.perform(post("/oauth2/token")
+                        .with(httpBasic(CLIENT_ID, "invalid-client-secret"))
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .param("grant_type", "authorization_code")
+                        .param("code", "invalid-code")
+                        .param("redirect_uri", REDIRECT_URI)
+                        .param("code_verifier", VERIFIER))
+                .andExpect(status().isUnauthorized())
+                .andExpect(header().doesNotExist("Location"))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.error").value("invalid_client"));
     }
 
     @Test
