@@ -52,3 +52,4 @@
 | 006 | 완료 | SSO 회원가입 및 DB 기반 로그인 구현 | [TASK_006_DETAIL.md](./TASK_006_DETAIL.md) |
 | 007 | 완료 | Neon용 PostgreSQL DDL 전환      | [TASK_007_DETAIL.md](./TASK_007_DETAIL.md) |
 | 008 | 완료 | OAuth2/OIDC Authorization Server 구현 | [TASK_008_DETAIL.md](./TASK_008_DETAIL.md) |
+| 009 | 미완료 | 직접 로그인 후 사용자별 서비스 목록 제공 | [TASK_009_DETAIL.md](./TASK_009_DETAIL.md) |
