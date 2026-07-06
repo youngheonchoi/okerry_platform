@@ -10,9 +10,12 @@ import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.config.annotation.web.configurers.oauth2.server.authorization.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
+import org.springframework.security.web.util.matcher.AndRequestMatcher;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -22,15 +25,19 @@ public class SecurityConfig {
     @Order(1)
     @Profile("neon")
     SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
+        OAuth2AuthorizationServerConfigurer authorizationServerConfigurer =
+                new OAuth2AuthorizationServerConfigurer();
+        RequestMatcher authorizationEndpointHtmlRequest = new AndRequestMatcher(
+                request -> "/oauth2/authorize".equals(request.getServletPath()),
+                new MediaTypeRequestMatcher(MediaType.TEXT_HTML));
+
         http
-                .oauth2AuthorizationServer(server -> {
-                    http.securityMatcher(server.getEndpointsMatcher());
-                    server.oidc(withDefaults());
-                })
+                .securityMatcher(authorizationServerConfigurer.getEndpointsMatcher())
+                .with(authorizationServerConfigurer, server -> server.oidc(withDefaults()))
                 .authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
                 .exceptionHandling(exceptions -> exceptions.defaultAuthenticationEntryPointFor(
                         new LoginUrlAuthenticationEntryPoint("/login"),
-                        new MediaTypeRequestMatcher(MediaType.TEXT_HTML)));
+                        authorizationEndpointHtmlRequest));
 
         return http.build();
     }
@@ -44,7 +51,14 @@ public class SecurityConfig {
 
         http
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/login", "/signup", "/signup/**", "/css/**", "/js/**").permitAll()
+                        .requestMatchers(
+                                "/login",
+                                "/signup",
+                                "/signup/**",
+                                "/css/**",
+                                "/js/**",
+                                "/.well-known/appspecific/**")
+                        .permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(formLogin -> formLogin

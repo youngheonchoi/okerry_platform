@@ -82,6 +82,7 @@
 * 사용자, 서비스 및 OAuth2 Client 관리 기능은 실제 로그인 연동 검증 이후 별도 작업으로 구현한다.
 * `okerry_console`은 Platform DB에 직접 접근하지 않고, 이후 `okerry platform`에서 제공할 관리자 API를 사용한다.
 * `okerry_console` 연동 전까지 TASK 008의 실제 Client 전체 흐름 완료 조건은 보류한다.
+* Console을 포함한 각 서비스는 독립된 Client ID, Secret, Redirect URI를 사용하며, Platform은 특정 서비스 전용 분기 없이 등록 정보로 Client를 식별한다.
 
 
 ## 완료 조건
@@ -104,8 +105,10 @@
 * [ ] OAuth2/OIDC 오류 응답에 내부 예외 상세가 노출되지 않는다.
 * [ ] 정상 인증, PKCE 실패, Redirect URI 불일치, Code 재사용, Code 만료, Refresh Token 재사용 테스트가 통과한다.
 * [x] 전체 기존 자동 테스트와 새 Authorization Server 테스트가 통과한다.
+* [ ] 복수의 등록 Client가 각자의 Redirect URI로 요청할 수 있고 다른 Client의 Redirect URI를 사용할 수 없다.
 * [ ] 실제 Neon 환경과 테스트 Client 사이의 로그인부터 UserInfo 조회까지 전체 흐름이 성공한다.
 * [ ] `/README.md`에 issuer, 표준 엔드포인트, Client 등록 및 연동 방법이 문서화된다.
+* [x] `/doc/task/GUIDE.md`에 모든 프로젝트가 참고할 공통 Client 연동 기준과 Next.js/Auth.js 구현 예시가 문서화된다.
 
 
 ## 진행 로그
@@ -126,3 +129,13 @@
 * 별도 프로젝트 `okerry_console`을 실제 OAuth2/OIDC Client로 사용하기로 결정함.
 * `okerry_console`에서 로그인, Callback, Token 및 UserInfo 연동을 구현한 뒤 TASK 008의 실제 Client 검증을 재개하기로 함.
 * 외부 Client 연동이 남아 있으므로 TASK 008과 DASHBOARD 상태는 `진행중`으로 유지함.
+
+### 2026-07-03
+
+* 향후 여러 서비스가 연결되는 것을 전제로 Client별 등록 정보와 Redirect URI를 독립적으로 검증하는 기준을 명시함.
+* 두 개의 등록 Client가 각자의 Redirect URI로 처리되고 Client 간 Redirect URI 교차 사용은 거부되는 통합 테스트를 추가함.
+* 모든 Client 프로젝트가 공통으로 적용할 Authorization Code, PKCE, Callback, Token, 사용자 매핑 및 보안 기준을 `/doc/task/GUIDE.md`에 작성함.
+* Next.js/Auth.js 설정은 공통 기준을 적용하는 구현 예시로 분리함.
+* Console의 Callback URI 예시를 Next.js/Auth.js 기본 경로인 `/api/auth/callback/okerry`로 정정함.
+* 도메인 도입 전 연동을 위해 GUIDE의 issuer, Authorization, Callback, Token 및 Discovery 예시를 `localhost:8080` Platform과 `localhost:3000` Client 기준으로 정리함.
+* 현재 WSL 실행 환경에 Java 21이 없어 새 통합 테스트 실행은 보류함. Java 21 환경에서 통과 확인 후 복수 Client 완료 조건을 갱신해야 함.

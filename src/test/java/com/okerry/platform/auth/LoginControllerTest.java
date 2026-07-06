@@ -59,6 +59,12 @@ class LoginControllerTest {
     }
 
     @Test
+    void chromeDevToolsDiscoveryRequestDoesNotTriggerLogin() throws Exception {
+        mockMvc.perform(get("/.well-known/appspecific/com.chrome.devtools.json"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     void invalidLoginRedirectsToLoginPageWithError() throws Exception {
         mockMvc.perform(post("/login")
                         .param("username", "user@example.com")
