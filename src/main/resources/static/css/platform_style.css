@@ -96,6 +96,37 @@ body.okerry_ui {
     flex-shrink: 0;
 }
 
+.platform-service-card-main {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--okerry-space-md);
+    align-items: start;
+}
+
+.platform-service-card-title-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--okerry-space-sm);
+    align-items: center;
+}
+
+.platform-service-logo {
+    display: grid;
+    width: 44px;
+    height: 44px;
+    place-items: center;
+    overflow: hidden;
+    border: 1px solid var(--okerry-color-border);
+    border-radius: var(--okerry-radius-md);
+    background: var(--okerry-color-bg);
+}
+
+.platform-service-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
 .platform-service-card-action {
     display: flex;
     justify-content: end;
@@ -130,5 +161,9 @@ body.okerry_ui {
 
     .platform-service-card-action > .okerry-btn {
         width: 100%;
+    }
+
+    .platform-service-card-main {
+        grid-template-columns: 1fr;
     }
 }

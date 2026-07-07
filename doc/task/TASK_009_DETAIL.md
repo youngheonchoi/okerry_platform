@@ -120,18 +120,18 @@ OAuth2/OIDC Client에서 시작한 로그인 성공 후에는 `/portal/services`
 
 ## 작업 체크리스트
 
-* [ ] 직접 로그인 성공 시 `/portal/services`로 이동
-* [ ] OAuth2/OIDC 로그인 성공 시 저장된 Authorization Request로 복귀
-* [ ] `registered_services` 조회 모델 및 Repository 구현
-* [ ] `service_users` 기반 사용자별 접근 가능 서비스 조회 구현
-* [ ] Controller 하드코딩 서비스 목록 제거
-* [ ] `enabled`, 서비스 사용자 상태 및 삭제 여부 필터 적용
-* [ ] `display_order`, 서비스명 정렬 적용
-* [ ] 서비스 카드 이동 주소에 `login_start_url` 적용
-* [ ] 접근 가능 서비스가 없는 경우 빈 상태 제공
-* [ ] 사용자 및 DB 오류에 대한 안전한 처리 적용
-* [ ] 사용자별 서비스 조회 단위/통합 테스트 추가
-* [ ] 직접 로그인과 OAuth2/OIDC 로그인 분기 회귀 테스트 추가
+* [x] 직접 로그인 성공 시 `/portal/services`로 이동
+* [x] OAuth2/OIDC 로그인 성공 시 저장된 Authorization Request로 복귀
+* [x] `registered_services` 조회 모델 및 Repository 구현
+* [x] `service_users` 기반 사용자별 접근 가능 서비스 조회 구현
+* [x] Controller 하드코딩 서비스 목록 제거
+* [x] `enabled`, 서비스 사용자 상태 및 삭제 여부 필터 적용
+* [x] `display_order`, 서비스명 정렬 적용
+* [x] 서비스 카드 이동 주소에 `login_start_url` 적용
+* [x] 접근 가능 서비스가 없는 경우 빈 상태 제공
+* [x] 사용자 및 DB 오류에 대한 안전한 처리 적용
+* [x] 사용자별 서비스 조회 단위/통합 테스트 추가
+* [x] 직접 로그인과 OAuth2/OIDC 로그인 분기 회귀 테스트 추가
 * [ ] 전체 테스트 실행
 * [ ] 실제 Neon 환경 검증
 
@@ -158,3 +158,13 @@ OAuth2/OIDC Client에서 시작한 로그인 성공 후에는 `/portal/services`
 * 직접 로그인 후 사용자별 서비스 목록으로 이동하는 과정에서 오류가 발생한다는 현상을 확인함.
 * 현재 Controller의 하드코딩 목록을 제거하고 `service_users`, `registered_services` 기반으로 전환하는 요구사항을 정의함.
 * 직접 로그인 성공 경로와 OAuth2/OIDC Saved Request 복귀 경로를 분리해 검증하도록 범위를 확정함.
+
+### 2026-07-07
+
+* `registered_services`, `service_users` JPA Entity와 Repository를 추가하고, 사용자별 접근 가능 서비스 조회를 `PortalServiceListQuery`로 분리함.
+* `PortalServiceListController`의 하드코딩 임시 서비스 목록을 제거하고 인증 principal 이메일 기준 DB 조회 결과를 사용하도록 변경함.
+* 서비스 목록 화면에 로고, 상태 뱃지, `PENDING_PROFILE`, 빈 상태, 조회 실패 안내를 추가하고 이동 URL은 `registered_services.login_start_url`을 사용하도록 변경함.
+* 포털 통합 테스트를 DB 기반 필터링, 정렬, 빈 상태, principal 불일치 시나리오로 갱신하고 OAuth2/OIDC 로그인은 저장된 Authorization Request로 복귀하는 단언을 추가함.
+* 플랫폼 루트(`/`) 직접 접근 시 404 Whitelabel이 발생하지 않도록 `/portal/services` 리다이렉트 매핑과 회귀 테스트를 추가함.
+* `/error`가 로그인 성공 후 Saved Request로 복귀되어 `status=999` Whitelabel이 표시되지 않도록 성공 핸들러와 공통 오류 화면을 추가함.
+* `./gradlew test`는 실행했으나 현재 환경에 `JAVA_HOME` 및 `java` 실행 파일이 없어 전체 테스트를 완료하지 못함.

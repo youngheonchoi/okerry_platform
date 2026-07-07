@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: document(title='okerry platform 오류', content=~{::main})}">
+<main class="platform-auth-page okerry-container">
+    <section class="platform-auth-card-wrap" aria-labelledby="error-title">
+        <div class="okerry-card">
+            <div class="okerry-card-header okerry-stack">
+                <h1 class="okerry-title-xl" id="error-title">요청을 처리할 수 없습니다.</h1>
+                <p class="okerry-text-muted">
+                    잠시 후 다시 시도하거나 서비스 목록으로 돌아가세요.
+                </p>
+            </div>
+            <div class="okerry-card-body okerry-stack">
+                <div class="okerry-alert okerry-alert-danger">
+                    오류 코드 <span th:text="${statusCode}">500</span>
+                </div>
+                <a class="okerry-btn okerry-btn-primary" th:href="@{/portal/services}">
+                    서비스 목록으로 이동
+                </a>
+            </div>
+        </div>
+    </section>
+</main>
+</html>
