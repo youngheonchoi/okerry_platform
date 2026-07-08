@@ -184,6 +184,9 @@ class AuthorizationServerIntegrationTest {
                         .param("password", "safe-password-123"))
                 .andExpect(status().is3xxRedirection())
                 .andReturn().getResponse().getRedirectedUrl();
+        assertThat(savedAuthorizationUri)
+                .startsWith("http://localhost/oauth2/authorize")
+                .doesNotContain("/portal/services");
 
         String clientRedirect = mockMvc.perform(get(URI.create(savedAuthorizationUri)).session(session))
                 .andExpect(status().is3xxRedirection())

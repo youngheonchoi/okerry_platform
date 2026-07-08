@@ -2,6 +2,7 @@ package com.okerry.platform.auth;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
@@ -24,6 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
@@ -104,6 +106,24 @@ class SignupLoginIntegrationTest {
         mockMvc.perform(post("/logout").session((org.springframework.mock.web.MockHttpSession) session).with(csrf()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/login"));
+    }
+
+    @Test
+    void loginIgnoresSavedErrorRequestAndRedirectsToPortalServices() throws Exception {
+        AuthUser user = createUser("saved-error@example.com", UserStatus.ACTIVE, "safe-password-123");
+        MockHttpSession session = new MockHttpSession();
+
+        mockMvc.perform(get("/error").session(session))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/portal/services"));
+
+        mockMvc.perform(post("/login")
+                        .session(session)
+                        .with(csrf())
+                        .param("username", user.getEmail())
+                        .param("password", "safe-password-123"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/portal/services"));
     }
 
     @Test
