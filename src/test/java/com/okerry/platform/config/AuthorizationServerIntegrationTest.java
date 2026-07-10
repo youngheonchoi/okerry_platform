@@ -10,6 +10,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
 
 import com.jayway.jsonpath.JsonPath;
 import com.okerry.platform.identity.AuthRole;
@@ -22,6 +26,11 @@ import com.okerry.platform.identity.AuthUserRole;
 import com.okerry.platform.identity.AuthUserRoleRepository;
 import com.okerry.platform.identity.PasswordHashService;
 import com.okerry.platform.identity.UserStatus;
+import com.okerry.platform.portal.RegisteredService;
+import com.okerry.platform.portal.RegisteredServiceRepository;
+import com.okerry.platform.portal.ServiceUser;
+import com.okerry.platform.portal.ServiceUserRepository;
+import com.okerry.platform.portal.ServiceUserStatus;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -30,11 +39,16 @@ import java.util.Base64;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.http.MediaType;
+import org.springframework.mail.MailSender;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
@@ -84,20 +98,27 @@ class AuthorizationServerIntegrationTest {
     @Autowired AuthUserRoleRepository userRoleRepository;
     @Autowired JwtDecoder jwtDecoder;
     @Autowired JdbcTemplate jdbcTemplate;
+    @Autowired RegisteredServiceRepository registeredServiceRepository;
+    @Autowired ServiceUserRepository serviceUserRepository;
+    @Autowired MailSender mailSender;
 
     private AuthUser user;
+    private AuthRole role;
 
     @BeforeEach
     void setUp() {
         jdbcTemplate.update("DELETE FROM oauth2_authorization_consent");
         jdbcTemplate.update("DELETE FROM oauth2_authorization");
         jdbcTemplate.update("DELETE FROM oauth2_registered_client");
+        serviceUserRepository.deleteAll();
+        registeredServiceRepository.deleteAll();
         userRoleRepository.deleteAll();
         credentialRepository.deleteAll();
         userRepository.deleteAll();
         roleRepository.deleteAll();
+        reset(mailSender);
 
-        AuthRole role = roleRepository.save(
+        role = roleRepository.save(
                 new AuthRole("AUTH_USER", "일반 사용자", "SSO 일반 인증 사용자"));
         user = new AuthUser("oidc-user@example.com", "OIDC 사용자", UserStatus.ACTIVE);
         user.verifyEmail();
@@ -128,6 +149,17 @@ class AuthorizationServerIntegrationTest {
                         .build())
                 .build();
         registeredClientRepository.save(client);
+        RegisteredService service = registeredServiceRepository.save(new RegisteredService(
+                "integration",
+                "Integration Service",
+                "Integration Service 설명",
+                "https://client.example.test",
+                "https://client.example.test/login",
+                null,
+                CLIENT_ID,
+                1,
+                true));
+        serviceUserRepository.save(new ServiceUser(user, service, ServiceUserStatus.ACTIVE));
 
         RegisteredClient secondClient = RegisteredClient.withId(UUID.randomUUID().toString())
                 .clientId(SECOND_CLIENT_ID)
@@ -151,6 +183,17 @@ class AuthorizationServerIntegrationTest {
                         .build())
                 .build();
         registeredClientRepository.save(secondClient);
+        RegisteredService secondService = registeredServiceRepository.save(new RegisteredService(
+                "second-integration",
+                "Second Integration Service",
+                "Second Integration Service 설명",
+                "https://second.example.test",
+                "https://second.example.test/login",
+                null,
+                SECOND_CLIENT_ID,
+                2,
+                true));
+        serviceUserRepository.save(new ServiceUser(user, secondService, ServiceUserStatus.ACTIVE));
     }
 
     @Test
@@ -317,9 +360,106 @@ class AuthorizationServerIntegrationTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    void blocksAuthorizationCodeAndSendsAccessRequestMailWhenUserHasNoServiceAccess() throws Exception {
+        AuthUser blockedUser = new AuthUser("blocked@example.com", "차단 사용자", UserStatus.ACTIVE);
+        blockedUser.verifyEmail();
+        userRepository.save(blockedUser);
+        credentialRepository.save(new AuthUserCredential(
+                blockedUser, passwordHashService.hash("safe-password-123"), PasswordHashService.ALGORITHM));
+        userRoleRepository.save(new AuthUserRole(blockedUser, role));
+
+        MockHttpSession session = new MockHttpSession();
+        mockMvc.perform(get("/oauth2/authorize")
+                        .session(session)
+                        .accept(MediaType.TEXT_HTML)
+                        .queryParam("response_type", "code")
+                        .queryParam("client_id", CLIENT_ID)
+                        .queryParam("redirect_uri", REDIRECT_URI)
+                        .queryParam("scope", "openid profile email")
+                        .queryParam("state", "access-denied-state")
+                        .queryParam("code_challenge", challenge(VERIFIER))
+                        .queryParam("code_challenge_method", "S256"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(header().string("Location", "/login"));
+
+        String savedAuthorizationUri = mockMvc.perform(post("/login")
+                        .session(session)
+                        .with(csrf())
+                        .param("username", blockedUser.getEmail())
+                        .param("password", "safe-password-123"))
+                .andExpect(status().is3xxRedirection())
+                .andReturn().getResponse().getRedirectedUrl();
+
+        String requestPage = mockMvc.perform(get(URI.create(savedAuthorizationUri)).session(session))
+                .andExpect(status().is3xxRedirection())
+                .andReturn().getResponse().getRedirectedUrl();
+        assertThat(requestPage).startsWith("/service-access/request?request_id=");
+        assertThat(requestPage).doesNotContain("code=");
+        String requestId = UriComponentsBuilder.fromUriString(requestPage).build()
+                .getQueryParams().getFirst("request_id");
+
+        mockMvc.perform(get(requestPage).session(session))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("서비스 접근 권한이 없습니다.")))
+                .andExpect(content().string(containsString("Integration Service")))
+                .andExpect(content().string(containsString("blocked@example.com")));
+
+        mockMvc.perform(post("/service-access/request")
+                        .session(session)
+                        .with(csrf())
+                        .param("request_id", requestId))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("접근 신청이 접수되었습니다.")));
+        verify(mailSender).send(any(SimpleMailMessage.class));
+    }
+
+    @Test
+    void doesNotOfferAccessRequestForClientWithoutRegisteredServiceMetadata() throws Exception {
+        String metadataMissingClientId = "metadata-missing-client";
+        String metadataMissingRedirectUri = "https://metadata.example.test/callback";
+        registeredClientRepository.save(RegisteredClient.withId(UUID.randomUUID().toString())
+                .clientId(metadataMissingClientId)
+                .clientSecret(passwordEncoder.encode("metadata-missing-secret"))
+                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                .redirectUri(metadataMissingRedirectUri)
+                .scope(OidcScopes.OPENID)
+                .clientSettings(ClientSettings.builder()
+                        .requireProofKey(true)
+                        .requireAuthorizationConsent(false)
+                        .build())
+                .tokenSettings(TokenSettings.builder()
+                        .authorizationCodeTimeToLive(Duration.ofMinutes(2))
+                        .build())
+                .build());
+
+        mockMvc.perform(get("/oauth2/authorize")
+                        .accept(MediaType.TEXT_HTML)
+                        .queryParam("response_type", "code")
+                        .queryParam("client_id", metadataMissingClientId)
+                        .queryParam("redirect_uri", metadataMissingRedirectUri)
+                        .queryParam("scope", "openid")
+                        .queryParam("state", "missing-service-state")
+                        .queryParam("code_challenge", challenge(VERIFIER))
+                        .queryParam("code_challenge_method", "S256"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(header().string("Location", "/service-access/unavailable"));
+    }
+
     private static String challenge(String verifier) throws Exception {
         byte[] digest = MessageDigest.getInstance("SHA-256")
                 .digest(verifier.getBytes(StandardCharsets.US_ASCII));
         return Base64.getUrlEncoder().withoutPadding().encodeToString(digest);
+    }
+
+    @TestConfiguration
+    static class MailTestConfiguration {
+
+        @Bean
+        @Primary
+        MailSender mailSender() {
+            return mock(MailSender.class);
+        }
     }
 }

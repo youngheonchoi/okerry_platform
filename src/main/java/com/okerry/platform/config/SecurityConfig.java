@@ -2,6 +2,10 @@ package com.okerry.platform.config;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
+import com.okerry.platform.serviceaccess.ServiceAccessAuthorizationFailureHandler;
+import com.okerry.platform.serviceaccess.ServiceAccessAuthorizationValidator;
+import java.lang.reflect.Method;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -16,6 +20,7 @@ import org.springframework.security.web.util.matcher.AndRequestMatcher;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.util.ReflectionUtils;
 
 @Configuration
 public class SecurityConfig {
@@ -23,7 +28,11 @@ public class SecurityConfig {
     @Bean
     @Order(1)
     @Profile("neon")
-    SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain authorizationServerSecurityFilterChain(
+            HttpSecurity http,
+            ObjectProvider<ServiceAccessAuthorizationValidator> serviceAccessValidatorProvider,
+            ObjectProvider<ServiceAccessAuthorizationFailureHandler> serviceAccessFailureHandlerProvider)
+            throws Exception {
         OAuth2AuthorizationServerConfigurer authorizationServerConfigurer =
                 new OAuth2AuthorizationServerConfigurer();
         RequestMatcher authorizationEndpointHtmlRequest = new AndRequestMatcher(
@@ -32,7 +41,15 @@ public class SecurityConfig {
 
         http
                 .securityMatcher(authorizationServerConfigurer.getEndpointsMatcher())
-                .with(authorizationServerConfigurer, server -> server.oidc(withDefaults()))
+                .with(authorizationServerConfigurer, server -> {
+                    serviceAccessValidatorProvider.ifAvailable(
+                            validator -> server.authorizationEndpoint(endpoint ->
+                                    addAuthorizationCodeRequestAuthenticationValidator(endpoint, validator)));
+                    serviceAccessFailureHandlerProvider.ifAvailable(
+                            handler -> server.authorizationEndpoint(endpoint ->
+                                    endpoint.errorResponseHandler(handler)));
+                    server.oidc(withDefaults());
+                })
                 .authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
                 .exceptionHandling(exceptions -> exceptions.defaultAuthenticationEntryPointFor(
                         new LoginUrlAuthenticationEntryPoint("/login"),
@@ -54,6 +71,7 @@ public class SecurityConfig {
                                 "/login",
                                 "/signup",
                                 "/signup/**",
+                                "/service-access/unavailable",
                                 "/css/**",
                                 "/js/**",
                                 "/.well-known/appspecific/**")
@@ -76,5 +94,19 @@ public class SecurityConfig {
     @Bean
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(12);
+    }
+
+    private void addAuthorizationCodeRequestAuthenticationValidator(
+            Object authorizationEndpoint,
+            ServiceAccessAuthorizationValidator validator) {
+        Method method = ReflectionUtils.findMethod(
+                authorizationEndpoint.getClass(),
+                "addAuthorizationCodeRequestAuthenticationValidator",
+                java.util.function.Consumer.class);
+        if (method == null) {
+            throw new IllegalStateException("Authorization request validator hook is unavailable");
+        }
+        ReflectionUtils.makeAccessible(method);
+        ReflectionUtils.invokeMethod(method, authorizationEndpoint, validator);
     }
 }

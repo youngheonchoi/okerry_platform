@@ -53,3 +53,4 @@
 | 007 | 완료 | Neon용 PostgreSQL DDL 전환      | [TASK_007_DETAIL.md](./TASK_007_DETAIL.md) |
 | 008 | 완료 | OAuth2/OIDC Authorization Server 구현 | [TASK_008_DETAIL.md](./TASK_008_DETAIL.md) |
 | 009 | 완료 | 직접 로그인 후 사용자별 서비스 목록 제공 | [TASK_009_DETAIL.md](./TASK_009_DETAIL.md) |
+| 010 | 진행중 | 서비스 접근 권한 없음 시 접근 신청 메일 발송 | [TASK_010_DETAIL.md](./TASK_010_DETAIL.md) |

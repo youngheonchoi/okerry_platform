@@ -42,6 +42,21 @@ body.okerry_ui {
     text-align: center;
 }
 
+.platform-access-summary {
+    display: grid;
+    gap: var(--okerry-space-sm);
+    margin: 0;
+}
+
+.platform-access-summary > div {
+    display: grid;
+    gap: var(--okerry-space-xs);
+}
+
+.platform-access-summary dd {
+    margin: 0;
+}
+
 .platform-portal-page {
     box-sizing: border-box;
     height: 100vh;

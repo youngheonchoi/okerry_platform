@@ -31,4 +31,18 @@ public interface ServiceUserRepository extends JpaRepository<ServiceUser, Long> 
             @Param("userId") Long userId,
             @Param("userStatus") UserStatus userStatus,
             @Param("serviceUserStatuses") Collection<ServiceUserStatus> serviceUserStatuses);
+
+    @Query("""
+            select count(serviceUser) > 0
+            from ServiceUser serviceUser
+            where serviceUser.user.id = :userId
+                and serviceUser.service.id = :serviceId
+                and serviceUser.deletedAt is null
+                and serviceUser.status in :serviceUserStatuses
+                and serviceUser.service.enabled = true
+            """)
+    boolean existsAccessibleServiceUser(
+            @Param("userId") Long userId,
+            @Param("serviceId") Long serviceId,
+            @Param("serviceUserStatuses") Collection<ServiceUserStatus> serviceUserStatuses);
 }

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: document(title='okerry platform 서비스 요청 오류', content=~{::main})}">
+<main class="platform-auth-page okerry-container">
+    <section class="platform-auth-card-wrap" aria-labelledby="service-access-unavailable-title">
+        <div class="okerry-card">
+            <div class="okerry-card-header okerry-stack">
+                <h1 class="okerry-title-xl" id="service-access-unavailable-title">서비스 요청을 처리할 수 없습니다.</h1>
+                <p class="okerry-text-muted">
+                    등록되지 않았거나 현재 사용할 수 없는 서비스입니다.
+                </p>
+            </div>
+            <div class="okerry-card-body okerry-stack">
+                <div class="okerry-alert okerry-alert-danger">
+                    서비스 정보를 확인한 뒤 다시 시도해주세요.
+                </div>
+                <a class="okerry-btn okerry-btn-primary" th:href="@{/portal/services}">
+                    서비스 목록으로 이동
+                </a>
+            </div>
+        </div>
+    </section>
+</main>
+</html>

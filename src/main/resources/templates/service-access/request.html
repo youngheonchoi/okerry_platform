@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: document(title='okerry platform 접근 신청', content=~{::main})}">
+<main class="platform-auth-page okerry-container">
+    <section class="platform-auth-card-wrap" aria-labelledby="service-access-request-title">
+        <div class="okerry-card">
+            <div class="okerry-card-header okerry-stack">
+                <h1 class="okerry-title-xl" id="service-access-request-title">서비스 접근 권한이 없습니다.</h1>
+                <p class="okerry-text-muted">
+                    관리자에게 서비스 접근 신청 메일을 보낼 수 있습니다.
+                </p>
+            </div>
+
+            <div class="okerry-card-body okerry-stack">
+                <div class="okerry-alert okerry-alert-success" th:if="${mailSent}">
+                    접근 신청이 접수되었습니다. 관리자가 권한을 등록한 뒤 다시 로그인해주세요.
+                </div>
+
+                <div class="okerry-alert okerry-alert-danger" th:if="${mailFailed}">
+                    지금은 접근 신청 메일을 보낼 수 없습니다. 잠시 후 다시 시도해주세요.
+                </div>
+
+                <dl class="platform-access-summary">
+                    <div>
+                        <dt class="okerry-caption">서비스</dt>
+                        <dd class="okerry-text" th:text="${accessRequest.serviceName()}">서비스 이름</dd>
+                    </div>
+                    <div>
+                        <dt class="okerry-caption">계정</dt>
+                        <dd class="okerry-text" th:text="${accessRequest.userEmail()}">user@example.com</dd>
+                    </div>
+                </dl>
+
+                <form class="okerry-stack"
+                      th:if="${!mailSent}"
+                      th:action="@{/service-access/request}"
+                      method="post">
+                    <input type="hidden"
+                           th:name="${_csrf.parameterName}"
+                           th:value="${_csrf.token}">
+                    <input type="hidden"
+                           name="request_id"
+                           th:value="${accessRequest.requestId()}">
+                    <button class="okerry-btn okerry-btn-primary" type="submit">
+                        접근 신청하기
+                    </button>
+                    <a class="okerry-btn okerry-btn-secondary" th:href="@{/portal/services}">
+                        서비스 목록으로 이동
+                    </a>
+                </form>
+
+                <a class="okerry-btn okerry-btn-primary"
+                   th:if="${mailSent}"
+                   th:href="@{/portal/services}">
+                    서비스 목록으로 이동
+                </a>
+            </div>
+        </div>
+    </section>
+</main>
+</html>
